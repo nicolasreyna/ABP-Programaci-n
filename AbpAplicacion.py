@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 import os
 
-# --- CONFIGURACIÓN DE RUTAS ---
+
 carpeta_proyecto = os.path.dirname(__file__)
 ruta_logo = os.path.join(carpeta_proyecto, "LOGO APP.png")
 
@@ -35,7 +35,7 @@ def mostrar_ventana_principal():
         background="darkslategray",
         foreground="white",
         font=("Arial", 15),
-    ).place(x=10, y=64) #cambio de pack a place y las medidas
+    ).place(x=10, y=64) 
 
     ttk.Label(
         ventana_principal,
@@ -50,13 +50,13 @@ def mostrar_ventana_principal():
         background="darkslategray",
         foreground="white",
         font=("Arial", 15),
-        ).place(x=10, y=100) #cambio de pack a place 
-    #Asignamos a variable        
+        ).place(x=10, y=100)  
+          
     entrada_dni = ttk.Entry(ventana_principal)
     entrada_dni.place(x=60, y=105)
 
 
-        #       agregue este para asignar la variable a la entrada de nombre del cliente
+        
     ttk.Label(
         ventana_principal,
         text="Nombre:",
@@ -64,7 +64,7 @@ def mostrar_ventana_principal():
         foreground="white",
         font=("Arial", 15),
     ).place(x=195, y=100)
-    #                  Aagregue la variable pase el ttk.Entry(ventana_principal, width=50).place(x=1005, y=135)
+    
     entrada_nombre_cliente = ttk.Entry(ventana_principal, width=20)
     entrada_nombre_cliente.place(x=280, y=105)
 
@@ -76,7 +76,7 @@ def mostrar_ventana_principal():
         font=("Arial", 15),
     ).place(x=0, y=135)
 
-    opciones = ["Crédito", "Transferencia", "Débito"] #podriamos agregar efectivo
+    opciones = ["Crédito", "Transferencia", "Débito"] 
     combo_pago =ttk.Combobox(ventana_principal, values=opciones, state="readonly")
     combo_pago.place(x=167, y=140)
 
@@ -87,7 +87,7 @@ def mostrar_ventana_principal():
         foreground="white",
         font=("Arial", 15),
     ).place(x=926, y=100)   
-    entrada_codigo = ttk.Entry(ventana_principal, width=20) #agregada la variable para la entrada de codigo del producto
+    entrada_codigo = ttk.Entry(ventana_principal, width=20) 
     entrada_codigo.place(x=1000, y=105)
 
     ttk.Label(
@@ -96,7 +96,7 @@ def mostrar_ventana_principal():
         background="darkslategray",
         foreground="white",
         font=("Arial", 15),
-    ).place(x=926, y=130) #cambiamos de pack  a place
+    ).place(x=926, y=130) 
     
     entrada_nombre_producto = ttk.Entry(ventana_principal)
     entrada_nombre_producto.place(x=1005, y=135)
@@ -109,7 +109,7 @@ def mostrar_ventana_principal():
       font=("Arial", 15),
      ).place(x=420, y=100)
 
-    entrada_apellido_cliente = ttk.Entry(ventana_principal)  #  agregue este para asignar la variable a la entrada de nombre del cliente
+    entrada_apellido_cliente = ttk.Entry(ventana_principal)  
     entrada_apellido_cliente.place(x=500, y=105)
 
 
@@ -190,10 +190,9 @@ def mostrar_ventana_principal():
         apellido = entrada_apellido_cliente.get()
         pago = combo_pago.get()
         
-        # Si no están vacíos, agregamos a la tabla
+        
         if dni and nombre and apellido and pago:
             tabla_Cliente.insert("", tk.END, values=(dni, nombre, apellido, pago))
-            # Limpiamos los campos
             entrada_dni.delete(0, tk.END)
             entrada_nombre_cliente.delete(0, tk.END)
             entrada_apellido_cliente.delete(0, tk.END)
@@ -213,11 +212,11 @@ def mostrar_ventana_principal():
             entrada_stock.delete(0, tk.END)
 
     #  Botones
-    btn_add_cliente = ttk.Button(ventana_principal, text="Agregar Cliente", command=agregar_cliente)
-    btn_add_cliente.place(x=350, y=140)
+    btn_agregar_cliente = tk.Button(ventana_principal, text="Agregar Cliente", command=agregar_cliente, bg="forestgreen", fg="white", font=("Arial", 10 , "bold"))
+    btn_agregar_cliente.place(x=350, y=140)
 
-    btn_add_producto = ttk.Button(ventana_principal, text="Agregar Producto", command=agregar_producto)
-    btn_add_producto.place(x=985, y=230)
+    btn_agregar_producto = tk.Button(ventana_principal, text="Agregar Producto", command=agregar_producto, bg="forestgreen", fg="white", font=("Arial", 10 , "bold"))
+    btn_agregar_producto.place(x=985, y=230)
 
 
     ventana_principal.mainloop()

@@ -1,13 +1,13 @@
-# login.py
+
 import tkinter as tk
 from tkinter import messagebox, ttk
 import os
 
-# --- AQUÍ HACEMOS EL IMPORT ---
+
 # Importamos la función 'mostrar_ventana_principal' desde el archivo 'abp_aplicacion.py'
 from AbpAplicacion import mostrar_ventana_principal
 
-# --- CONFIGURACIÓN DE RUTAS ---
+
 carpeta_proyecto = os.path.dirname(__file__)
 ruta_logo = os.path.join(carpeta_proyecto, "LOGO APP.png")
 
@@ -19,7 +19,7 @@ def verificar_contrasena():
     entrada = entrada_pass.get()
 
     if entrada == "1234":
-        ventana_login.destroy()  # Cierra la ventana de login
+        ventana_login.destroy()  
         mostrar_ventana_principal()  # LLAMAMOS A LA FUNCIÓN IMPORTADA AQUÍ
     else:
         intentos_restantes -= 1
@@ -37,7 +37,7 @@ def verificar_contrasena():
             ventana_login.destroy()
 
 
-# --- VENTANA DE LOGIN ---
+
 ventana_login = tk.Tk()
 ventana_login.title("Acceso al Sistema")
 ventana_login.geometry("400x200")

@@ -6,8 +6,6 @@ Modularidad entre archivos (AbpAplicacion y AbpInicio trabajan en conjunto para 
 Por ultimo, se procuro usar Pady/padx para la organizacion de los widgets en los contenedores FRAME creados.
 
 
-
-
 ANTES DE QUE EJECUTES LA APLICACION. SE TIENE QUE EJECUTAR MEDIANTE EL ARCHIVO AbpInicio.py, Y LA CONTRASEÑA ES 1234.
 
 Se procuró a que todos los miembros pudiesen constribuir al proyecto, incluyendo commits de los colaboradores, Benjamin Morgado, Fiamma Tissera, Guido Mandile y el creador del repositorio, Nicolas Reyna.
