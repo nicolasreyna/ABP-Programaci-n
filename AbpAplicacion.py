@@ -87,7 +87,7 @@ def mostrar_ventana_principal():
       foreground="white",
       font=("Arial", 11),
   ).pack(anchor="w")
-  opciones = ["Crédito", "Transferencia", "Débito"]
+  opciones = ["Crédito", "Transferencia", "Débito", "Efectivo"]
   combo_pago = ttk.Combobox(
       client_form, values=opciones, state="readonly"
   )
