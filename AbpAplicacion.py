@@ -35,7 +35,7 @@ def mostrar_ventana_principal():
   container.pack(fill=tk.BOTH, expand=True, padx=20, pady=10)
 
   # ==================== CLIENTES ====================
-  left_frame = tk.Frame(container, bg="darkslategray")
+  left_frame = tk.Frame(container, bg="darkslategray", bd=5, relief="groove")
   left_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0, 15))
 
   ttk.Label(
@@ -143,7 +143,7 @@ def mostrar_ventana_principal():
   tabla_Cliente.insert("", "end", values=("28555999", "María", "Gómez", "Debito"))
 
   # ====================  PRODUCTOS ====================
-  right_frame = tk.Frame(container, bg="darkslategray")
+  right_frame = tk.Frame(container, bg="darkslategray", bd=5, relief="groove")
   right_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True, padx=(15, 0))
 
   ttk.Label(
