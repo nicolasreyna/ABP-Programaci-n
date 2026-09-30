@@ -1,5 +1,5 @@
 Somos el grupo "SINERGIA DIGITAL" de la universidad ISPC de cordoba. 
-En este proyecto construimos una app con TKINTER Y TTK. Ademas incorporando otra librería más OS, para el ajuste del  logo de la app.
+En este proyecto construimos una app con TKINTER Y TTK. Ademas incorporando OS que es un módulo de la biblioteca estándar de Python y en este proyecto se utilizo para construir correctamente la ruta hacia el archivo de imagen (os.path.join(carpeta_proyecto, "LOGO APP.png"))
 
 La APP, incluye de momento tablas de cliente y producto hechas con treeview, funcionalidades de botones básicas como "AGREGAR", 
 Modularidad entre archivos (AbpAplicacion y AbpInicio trabajan en conjunto para formar toda la app), Uso de widgets como labels, entrys y más. 
