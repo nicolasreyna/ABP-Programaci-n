@@ -1,6 +1,6 @@
 import os
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 
 
 carpeta_proyecto = os.path.dirname(__file__)
@@ -99,7 +99,13 @@ def mostrar_ventana_principal():
     nombre = entrada_nombre_cliente.get()
     apellido = entrada_apellido_cliente.get()
     pago = combo_pago.get()
-
+    if not (dni.isdigit() and len(dni) <= 8):
+            messagebox.showerror(
+                    "Error",
+                    " El DNI introducido no es válido y srecuerde que el dni no debe tener mas de 8 digitos y no debe contener letras. "
+            )
+            return
+      
     if dni and nombre and apellido and pago:
       tabla_Cliente.insert("", tk.END, values=(dni, nombre, apellido, pago))
       entrada_dni.delete(0, tk.END)
@@ -107,7 +113,7 @@ def mostrar_ventana_principal():
       entrada_apellido_cliente.delete(0, tk.END)
       combo_pago.set("")
 
-  
+#agregar un maximo de logitud de 8 caracteres para la validacion de dni y que acepte unicamente numeros
   btn_add_cliente = tk.Button(
       client_form,
       text="Agregar Cliente",
@@ -205,14 +211,31 @@ def mostrar_ventana_principal():
     precio = entrada_precio.get()
     stock = entrada_stock.get()
 
+    if precio and stock:
+        try:
+            precio_valor = float(precio)
+            stock_valor = int(stock)
+            if precio_valor < 0 or stock_valor < 0:
+                messagebox.showerror(
+                    "Error",
+                    "El precio y el stock no pueden ser números negativos.",
+                )
+                return
+        except ValueError:
+            messagebox.showerror(
+                "Error",
+                "El precio debe ser un número válido y el stock debe ser un número entero.",
+            )
+            return
+
     if codigo and nombre and precio and stock:
       tabla_producto.insert("", tk.END, values=(codigo, nombre, precio, stock))
       entrada_codigo.delete(0, tk.END)
       entrada_nombre_producto.delete(0, tk.END)
       entrada_precio.delete(0, tk.END)
       entrada_stock.delete(0, tk.END)
+# modificar el codigo  de precio y stock para que rechaze numeros negativos 
 
-  
   btn_add_producto = tk.Button(
       product_form,
       text="Agregar Producto",
