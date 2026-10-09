@@ -144,7 +144,7 @@ def Proveedor(parent):
             )
             return
 
-        if "@" not in email or "." not in email:
+        if "@" not in email or "." not in email or len(email) < 5:
             messagebox.showerror("Email inválido", "Ingresá un email con formato válido.")
             return
 

@@ -71,7 +71,7 @@ def Cliente(parent: tk.Frame):
     tabla.insert("", "end", values=("28555999", "María", "Gómez", "Débito"))
 
     # ── Lógica de agregar ──
-    def agregar_cliente() -> None:
+    def agregar_cliente():
         dni      = entrada_dni.get().strip()
         nombre   = entrada_nombre.get().strip()
         apellido = entrada_apellido.get().strip()
@@ -113,7 +113,7 @@ def Cliente(parent: tk.Frame):
     tabla.bind("<<TreeviewSelect>>", cargar_cliente)
 
     # ── Lógica de modificar ──
-    def modificar_cliente() -> None:
+    def modificar_cliente():
         seleccion = tabla.selection()
 
         if not seleccion:
@@ -143,7 +143,7 @@ def Cliente(parent: tk.Frame):
         tabla.selection_remove(seleccion)  # deselecciona y limpia el formulario
 
     # ── Lógica de borrar ──
-    def borrar_cliente() -> None:
+    def borrar_cliente():
         seleccion = tabla.selection()
 
         if not seleccion:
