@@ -55,7 +55,7 @@ def Cliente(parent: tk.Frame):
 
     # ── Tabla ──
     columnas = ("dni", "Nombre", "Apellido", "Pago")
-    tabla = ttk.Treeview(left_frame, columns=columnas, show="headings", height=8)
+    tabla = ttk.Treeview(left_frame, columns=columnas, show="headings", height=8, selectmode="browse")
     for col, ancho, anchor in [
         ("dni",      100, "center"),
         ("Nombre",   130, "w"),
@@ -93,17 +93,112 @@ def Cliente(parent: tk.Frame):
             entry.delete(0, tk.END)
         combo_pago.set("")
 
+    # ── Cargar cliente seleccionado en el formulario ──
+    def cargar_cliente(event=None) -> None:
+        seleccion = tabla.selection()
+
+        for entry in (entrada_dni, entrada_nombre, entrada_apellido):
+            entry.delete(0, tk.END)
+        combo_pago.set("")
+
+        if not seleccion:
+            return
+
+        dni, nombre, apellido, pago = tabla.item(seleccion[0], "values")
+        entrada_dni.insert(0, str(dni))
+        entrada_nombre.insert(0, nombre)
+        entrada_apellido.insert(0, apellido)
+        combo_pago.set(pago)
+
+    tabla.bind("<<TreeviewSelect>>", cargar_cliente)
+
+    # ── Lógica de modificar ──
+    def modificar_cliente() -> None:
+        seleccion = tabla.selection()
+
+        if not seleccion:
+            messagebox.showwarning(
+                "Sin selección",
+                "Seleccioná un cliente de la tabla para modificarlo.",
+            )
+            return
+
+        dni      = entrada_dni.get().strip()
+        nombre   = entrada_nombre.get().strip()
+        apellido = entrada_apellido.get().strip()
+        pago     = combo_pago.get()
+
+        if not all([dni, nombre, apellido, pago]):
+            messagebox.showwarning("Campos incompletos", "Por favor completá todos los campos.")
+            return
+
+        if not dni.isdigit() or len(dni) > 8:
+            messagebox.showerror(
+                "DNI inválido",
+                "El DNI debe contener solo números y tener como máximo 8 dígitos.",
+            )
+            return
+
+        tabla.item(seleccion[0], values=(dni, nombre, apellido, pago))
+        tabla.selection_remove(seleccion)  # deselecciona y limpia el formulario
+
+    # ── Lógica de borrar ──
+    def borrar_cliente() -> None:
+        seleccion = tabla.selection()
+
+        if not seleccion:
+            messagebox.showwarning(
+                "Sin selección",
+                "Seleccioná un cliente de la tabla para borrarlo.",
+            )
+            return
+
+        # Armamos el mensaje con los datos del cliente elegido
+        dni, nombre, apellido, _ = tabla.item(seleccion[0], "values")
+        confirmar = messagebox.askyesno(
+            "Confirmar eliminación",
+            f"¿Seguro que querés borrar a {nombre} {apellido} (DNI {dni})?",
+        )
+
+        if confirmar:
+            for item in seleccion:
+                tabla.delete(item)
+            tabla.event_generate("<<TreeviewSelect>>")
+
+
+    # ── Botones ──
+    frame_botones = tk.Frame(form, bg="black")
+    frame_botones.pack(anchor="w", pady=(0, 12))
+
     tk.Button(
-        form,
+        frame_botones,
         text="Agregar Cliente",
         command=agregar_cliente,
         bg="forestgreen", fg="white",
         activebackground="green", activeforeground="white",
         font=("Arial", 10, "bold"),
         cursor="hand2",
-    ).pack(anchor="w", pady=(0, 12))
+    ).pack(side=tk.LEFT, padx=(0, 10))
 
+    tk.Button(
+        frame_botones,
+        text="Modificar Cliente",
+        command=modificar_cliente,
+        bg="royalblue", fg="white",
+        activebackground="navy", activeforeground="white",
+        font=("Arial", 10, "bold"),
+        cursor="hand2",
+    ).pack(side=tk.LEFT, padx=(0, 10))
 
+    tk.Button(
+        frame_botones,
+        text="Borrar Cliente",
+        command=borrar_cliente,
+        bg="firebrick", fg="white",
+        activebackground="darkred", activeforeground="white",
+        font=("Arial", 10, "bold"),
+        cursor="hand2",
+    ).pack(side=tk.LEFT)
 
 
 def Producto(parent: tk.Frame):
@@ -143,7 +238,7 @@ def Producto(parent: tk.Frame):
 
     
     columnas = ("codigo", "nombre", "precio", "stock")
-    tabla = ttk.Treeview(right_frame, columns=columnas, show="headings", height=8)
+    tabla = ttk.Treeview(right_frame, columns=columnas, show="headings", height=8, selectmode="browse")
     for col, texto, ancho, anchor in [
         ("codigo", "Código",   90,  "center"),
         ("nombre", "Producto", 150, "w"),
@@ -186,16 +281,117 @@ def Producto(parent: tk.Frame):
         for entry in (entrada_codigo, entrada_nombre, entrada_precio, entrada_stock):
             entry.delete(0, tk.END)
 
+
+    # ── Cargar producto seleccionado en el formulario ──
+    def cargar_producto(event=None):
+        seleccion = tabla.selection()
+
+        for entry in (entrada_codigo, entrada_nombre, entrada_precio, entrada_stock):
+            entry.delete(0, tk.END)
+
+        if not seleccion:
+            return
+
+        codigo, nombre, precio, stock = tabla.item(seleccion[0], "values")
+        entrada_codigo.insert(0, codigo)
+        entrada_nombre.insert(0, nombre)
+        entrada_precio.insert(0, str(precio).lstrip("$"))  # sacamos el "$" para poder validarlo
+        entrada_stock.insert(0, stock)
+
+    tabla.bind("<<TreeviewSelect>>", cargar_producto)
+
+    # ── Lógica de modificar ──
+    def modificar_producto():
+        seleccion = tabla.selection()
+
+        if not seleccion:
+            messagebox.showwarning(
+                "Sin selección",
+                "Seleccioná un producto de la tabla para modificarlo.",
+            )
+            return
+
+        codigo = entrada_codigo.get().strip()
+        nombre = entrada_nombre.get().strip()
+        precio = entrada_precio.get().strip()
+        stock  = entrada_stock.get().strip()
+
+        if not all([codigo, nombre, precio, stock]):
+            messagebox.showwarning("Campos incompletos", "Por favor completá todos los campos.")
+            return
+
+        try:
+            precio_val = float(precio)
+            stock_val  = int(stock)
+        except ValueError:
+            messagebox.showerror(
+                "Valores inválidos",
+                "El precio debe ser un número (ej: 1500.50) y el stock un número entero.",
+            )
+            return
+
+        if precio_val < 0 or stock_val < 0:
+            messagebox.showerror("Error", "El precio y el stock no pueden ser negativos.")
+            return
+
+        tabla.item(seleccion[0], values=(codigo, nombre, f"${precio_val:.2f}", stock_val))
+        tabla.selection_remove(seleccion)
+
+# ── Lógica de borrar ──
+    def borrar_producto():
+        seleccion = tabla.selection()
+
+        if not seleccion:
+            messagebox.showwarning(
+                "Sin selección",
+                "Seleccioná un producto de la tabla para borrarlo.",
+            )
+            return
+
+        codigo, nombre, _, _ = tabla.item(seleccion[0], "values")
+        confirmar = messagebox.askyesno(
+            "Confirmar eliminación",
+            f"¿Seguro que querés borrar el producto {nombre} (código {codigo})?",
+        )
+
+        if confirmar:
+            tabla.delete(seleccion[0])
+            tabla.event_generate("<<TreeviewSelect>>")
+
+    frame_botones = tk.Frame(form, bg="black")
+    frame_botones.pack(anchor="w", pady=(0, 12))
+
     tk.Button(
-        form,
+        frame_botones,
         text="Agregar Producto",
         command=agregar_producto,
         bg="forestgreen", fg="white",
         activebackground="green", activeforeground="white",
         font=("Arial", 10, "bold"),
         cursor="hand2",
-    ).pack(anchor="w", pady=(0, 12))
+    ).pack(side=tk.LEFT, padx=(0, 10))
 
+    tk.Button(
+        frame_botones,
+        text="Modificar Producto",
+        command=modificar_producto,
+        bg="royalblue", fg="white",
+        activebackground="navy", activeforeground="white",
+        font=("Arial", 10, "bold"),
+        cursor="hand2",
+    ).pack(side=tk.LEFT, padx=(0, 10))
+
+    tk.Button(
+        frame_botones,
+        text="Borrar Producto",
+        command=borrar_producto,
+        bg="firebrick", fg="white",
+        activebackground="darkred", activeforeground="white",
+        font=("Arial", 10, "bold"),
+        cursor="hand2",
+    ).pack(side=tk.LEFT)
+
+    
 
 def mostrar_ventana_principal():
     ventana = tk.Tk()

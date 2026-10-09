@@ -47,7 +47,7 @@ def Ventas(parent):
     frame_tabla.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 10))
 
     columnas = ("id_venta", "fecha_hora", "monto_total", "id_cliente", "id_vendedor")
-    tabla = ttk.Treeview(frame_tabla, columns=columnas, show="headings", height=15)
+    tabla = ttk.Treeview(frame_tabla, columns=columnas, show="headings", height=15, selectmode="browse")
     for col, texto, ancho, anchor in [
         ("id_venta",     "ID Venta",     80,  "center"),
         ("fecha_hora",   "Fecha y Hora", 150, "center"),
@@ -108,6 +108,90 @@ def Ventas(parent):
         for entry in (entrada_monto_total, entrada_id_cliente, entrada_id_vendedor):
             entry.delete(0, tk.END)
 
+
+    # ── Cargar venta seleccionada en el formulario ──
+    def cargar_venta(event=None):
+        seleccion = tabla.selection()
+
+        for entry in (entrada_monto_total, entrada_id_cliente, entrada_id_vendedor):
+            entry.delete(0, tk.END)
+
+        if not seleccion:
+            return
+
+        _, _, monto, id_cliente, id_vendedor = tabla.item(seleccion[0], "values")
+        entrada_monto_total.insert(0, str(monto).lstrip("$"))
+        entrada_id_cliente.insert(0, id_cliente)
+        entrada_id_vendedor.insert(0, id_vendedor)
+
+    tabla.bind("<<TreeviewSelect>>", cargar_venta)
+
+    # ── Lógica de modificar ──
+    def modificar_venta():
+        seleccion = tabla.selection()
+
+        if not seleccion:
+            messagebox.showwarning(
+                "Sin selección",
+                "Seleccioná una venta de la tabla para modificarla.",
+            )
+            return
+
+        Monto_total = entrada_monto_total.get().strip()
+        Cliente_id  = entrada_id_cliente.get().strip()
+        Vendedor_id = entrada_id_vendedor.get().strip()
+
+        if not all([Monto_total, Cliente_id, Vendedor_id]):
+            messagebox.showwarning("Error", "Todos los campos son obligatorios.")
+            return
+
+        try:
+            monto_val = float(Monto_total)
+        except ValueError:
+            messagebox.showerror("Monto inválido", "El monto total debe ser un número válido.")
+            return
+
+        if monto_val <= 0:
+            messagebox.showerror("Monto inválido", "El monto total debe ser mayor a cero.")
+            return
+
+        if not Cliente_id.isdigit() or not Vendedor_id.isdigit():
+            messagebox.showerror("IDs inválidos", "El ID de cliente y vendedor deben ser números enteros.")
+            return
+
+        # El ID y la fecha originales de la venta se conservan
+        id_venta, fecha_hora = tabla.item(seleccion[0], "values")[:2]
+        tabla.item(seleccion[0], values=(
+            id_venta,
+            fecha_hora,
+            f"${monto_val:.2f}",
+            Cliente_id,
+            Vendedor_id,
+        ))
+        tabla.selection_remove(seleccion)
+
+    # ── Lógica de borrar ──
+    def borrar_venta():
+        seleccion = tabla.selection()
+
+        if not seleccion:
+            messagebox.showwarning(
+                "Sin selección",
+                "Seleccioná una venta de la tabla para borrarla.",
+            )
+            return
+
+        valores = tabla.item(seleccion[0], "values")
+        confirmar = messagebox.askyesno(
+            "Confirmar eliminación",
+            f"¿Seguro que querés borrar la venta N° {valores[0]} ({valores[1]})?",
+        )
+
+        if confirmar:
+            tabla.delete(seleccion[0])
+            tabla.event_generate("<<TreeviewSelect>>")
+
+
     frame_btn = tk.Frame(Frame_principal, bg="black")
     frame_btn.pack(fill=tk.X, padx=10, pady=(0, 10))
 
@@ -119,8 +203,29 @@ def Ventas(parent):
         activebackground="green", activeforeground="white",
         font=("Arial", 10, "bold"),
         cursor="hand2",
-    ).pack(anchor="w")
+    ).pack(side=tk.LEFT, padx=(0, 10))
 
+
+    tk.Button(
+        frame_btn,
+        text="Modificar Venta",
+        command=modificar_venta,
+        bg="royalblue", fg="white",
+        activebackground="navy", activeforeground="white",
+        font=("Arial", 10, "bold"),
+        cursor="hand2",
+    ).pack(side=tk.LEFT, padx=(0, 10))
+
+
+    tk.Button(
+        frame_btn,
+        text="Borrar Venta",
+        command=borrar_venta,
+        bg="firebrick", fg="white",
+        activebackground="darkred", activeforeground="white",
+        font=("Arial", 10, "bold"),
+        cursor="hand2",
+    ).pack(side=tk.LEFT)
 
 
 def mostrar_ventana_ventas():
