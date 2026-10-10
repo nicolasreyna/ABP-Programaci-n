@@ -64,8 +64,8 @@ def Ventas(parent):
     scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
     tabla.pack(fill=tk.BOTH, expand=True)
 
-    tabla.insert("", "end", values=("1", "2024-06-01 10:30", "150.00", "1", "201"))
-    tabla.insert("", "end", values=("2", "2024-06-02 14:45", "200.00", "2", "202"))
+    tabla.insert("", "end", values=("1", "2024-06-01 10:30", "150.00", "1", "1"))
+    tabla.insert("", "end", values=("2", "2024-06-02 14:45", "200.00", "2", "1"))
 
     # ── Lógica de agregar ── (adentro de Ventas para acceder a entrada_* y tabla)
     def siguiente_id():

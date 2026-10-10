@@ -258,7 +258,7 @@ def Compra(parent):
     tabla.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 10))
 
     # Datos de ejemplo
-    tabla.insert("", "end", values=("1", "2026-10-05 09:30:00", "$15000.00", "1", "3"))
+    tabla.insert("", "end", values=("1", "2026-10-05 09:30:00", "$15000.00", "1", "1"))
     tabla.insert("", "end", values=("2", "2026-10-05 11:15:00", "$13200.00", "2", "1"))
 
     # ── Lógica de agregar ──

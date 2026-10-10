@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from CicloDeCompras import Proveedor, Compra
 from Ventas import Ventas
+from Vendedor import Vendedor
 carpeta_proyecto = os.path.dirname(__file__)
 ruta_logo = os.path.join(carpeta_proyecto, "LOGO APP.png")
 
@@ -466,8 +467,15 @@ def mostrar_ventana_principal():
     main_frame_ventas.pack(fill=tk.BOTH, expand=True)
 
     Ventas(main_frame_ventas)
+    
 
+    tab_vendedor = tk.Frame(notebook, bg="black")
+    notebook.add(tab_vendedor, text="Vendedores")
+    main_frame_vendedor = tk.Frame(tab_vendedor, bg="black")
+    main_frame_vendedor.pack(fill=tk.BOTH, expand=True)
 
+    Vendedor(main_frame_vendedor)
+    
     ventana.mainloop()
 
 
