@@ -1,9 +1,16 @@
 import os
+import sys
 import tkinter as tk
 from tkinter import ttk, messagebox
 from CicloDeCompras import Proveedor, Compra
 from Ventas import Ventas
 from Vendedor import Vendedor
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+
+from BASE_DE_DATOS.cliente_db  import agregar_cliente as db_agregar_cliente, obtener_clientes as db_obtener_clientes, modificar_cliente as db_modificar_cliente, eliminar_cliente as db_eliminar_cliente
+from BASE_DE_DATOS.producto_db import agregar_producto as db_agregar_producto, obtener_productos as db_obtener_productos, modificar_producto as db_modificar_producto, eliminar_producto as db_eliminar_producto
+
+
 carpeta_proyecto = os.path.dirname(__file__)
 ruta_logo = os.path.join(carpeta_proyecto, "LOGO APP.png")
 
@@ -68,9 +75,11 @@ def Cliente(parent: tk.Frame):
         tabla.column(col, width=ancho, anchor=anchor)
     tabla.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 10))
 
-    # Datos de ejemplo
-    tabla.insert("", "end", values=("1", "30111222", "Juan",  "Pérez", "Transferencia"))
-    tabla.insert("", "end", values=("2", "28555999", "María", "Gómez", "Débito"))
+    def cargar_tabla():
+     tabla.delete(*tabla.get_children())
+    for fila in db_obtener_clientes():
+        tabla.insert("", "end", values=fila)
+
 
     def siguiente_id():
         ids = [int(tabla.item(item, "values")[0]) for item in tabla.get_children()]
@@ -96,7 +105,12 @@ def Cliente(parent: tk.Frame):
 
         id_cliente = str(siguiente_id())
 
-        tabla.insert("", tk.END, values=(id_cliente, dni, nombre, apellido, pago))
+        try:
+            db_agregar_cliente(dni, nombre, apellido, pago)
+            cargar_tabla()
+        except Exception as e:
+         messagebox.showerror("Error", f"No se pudo guardar.\n{e}")
+
         for entry in (entrada_dni, entrada_nombre, entrada_apellido):
             entry.delete(0, tk.END)
         combo_pago.set("")
@@ -148,8 +162,17 @@ def Cliente(parent: tk.Frame):
             return
 
         id_cliente = tabla.item(seleccion[0], "values")[0]
-        tabla.item(seleccion[0], values=(id_cliente, dni, nombre, apellido, pago))
-        tabla.selection_remove(seleccion)  # deselecciona y limpia el formulario
+        try:
+            db_modificar_cliente(id_cliente, dni, nombre, apellido, pago)
+            cargar_tabla()
+        except Exception as e:
+            messagebox.showerror("Error", f"No se pudo modificar.\n{e}")
+            return
+
+        tabla.selection_remove(seleccion[0])
+        for entry in (entrada_dni, entrada_nombre, entrada_apellido):
+            entry.delete(0, tk.END)
+        combo_pago.set("")
 
     # ── Lógica de borrar ──
     def borrar_cliente():
@@ -162,18 +185,22 @@ def Cliente(parent: tk.Frame):
             )
             return
 
-        # Armamos el mensaje con los datos del cliente elegido
-        id_cliente, dni, nombre, apellido, _ = tabla.item(seleccion[0], "values")
+        item_seleccionado = seleccion[0]
+        id_cliente, dni, nombre, apellido, _ = tabla.item(item_seleccionado, "values")
         confirmar = messagebox.askyesno(
             "Confirmar eliminación",
             f"¿Seguro que querés borrar a {nombre} {apellido} (DNI {dni})?",
         )
 
         if confirmar:
-            for item in seleccion:
-                tabla.delete(item)
-            tabla.event_generate("<<TreeviewSelect>>")
+            try:
+                db_eliminar_cliente(id_cliente)
+                cargar_tabla()
+            except Exception as e:
+                messagebox.showerror("Error", f"No se pudo borrar.\n{e}")
+                return
 
+            tabla.event_generate("<<TreeviewSelect>>")
 
     # ── Botones ──
     frame_botones = tk.Frame(form, bg="black")
@@ -258,9 +285,11 @@ def Producto(parent: tk.Frame):
         tabla.column(col, width=ancho, anchor=anchor)
     tabla.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 10))
 
-    # Datos de ejemplo
-    tabla.insert("", "end", values=("P001", "Arroz 1kg",   "$1500", "2"))
-    tabla.insert("", "end", values=("P002", "Fideos 500g", "$900",  "1"))
+    def cargar_tabla():
+     tabla.delete(*tabla.get_children())
+    for fila in db_obtener_productos():
+        tabla.insert("", "end", values=fila)
+
 
     def agregar_producto():
         codigo = entrada_codigo.get().strip()
@@ -286,7 +315,12 @@ def Producto(parent: tk.Frame):
             messagebox.showerror("Error", "El precio y el stock no pueden ser negativos.")
             return
 
-        tabla.insert("", tk.END, values=(codigo, nombre, f"${precio_val:.2f}", stock_val))
+        try:
+            db_agregar_producto(codigo, nombre, f"${precio_val:.2f}", stock_val)
+            cargar_tabla()
+        except Exception as e:
+                 messagebox.showerror("Error", f"No se pudo guardar.\n{e}")
+
         for entry in (entrada_codigo, entrada_nombre, entrada_precio, entrada_stock):
             entry.delete(0, tk.END)
 
@@ -343,8 +377,14 @@ def Producto(parent: tk.Frame):
             messagebox.showerror("Error", "El precio y el stock no pueden ser negativos.")
             return
 
-        tabla.item(seleccion[0], values=(codigo, nombre, f"${precio_val:.2f}", stock_val))
-        tabla.selection_remove(seleccion)
+        try:
+         id_producto = tabla.item(seleccion[0], "values")[0]
+         db_modificar_producto(id_producto, codigo, nombre, f"${precio_val:.2f}", stock_val)
+         cargar_tabla()
+        except Exception as e:
+         messagebox.showerror("Error", f"No se pudo modificar.\n{e}")
+
+        tabla.selection_remove(seleccion[0])
 
 # ── Lógica de borrar ──
     def borrar_producto():
@@ -357,14 +397,20 @@ def Producto(parent: tk.Frame):
             )
             return
 
-        codigo, nombre, _, _ = tabla.item(seleccion[0], "values")
+        id_producto, codigo, nombre, _, _ = tabla.item(seleccion[0], "values")
         confirmar = messagebox.askyesno(
             "Confirmar eliminación",
             f"¿Seguro que querés borrar el producto {nombre} (código {codigo})?",
         )
 
         if confirmar:
-            tabla.delete(seleccion[0])
+            try:
+                db_eliminar_producto(id_producto)
+                cargar_tabla()
+            except Exception as e:
+                messagebox.showerror("Error", f"No se pudo borrar.\n{e}")
+                return
+
             tabla.event_generate("<<TreeviewSelect>>")
 
     frame_botones = tk.Frame(form, bg="black")

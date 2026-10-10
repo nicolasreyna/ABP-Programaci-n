@@ -1,7 +1,13 @@
 import os
+import sys
 import tkinter as tk
 from tkinter import ttk, messagebox
 from datetime import datetime
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+from BASE_DE_DATOS.proveedor_db import agregar_proveedor, obtener_proveedores, modificar_proveedor, eliminar_proveedor
+from BASE_DE_DATOS.compra_db    import agregar_compra, obtener_compras, modificar_compra, eliminar_compra
+
 
 carpeta_proyecto = os.path.dirname(__file__)
 ruta_logo = os.path.join(carpeta_proyecto, "LOGO APP.png")
@@ -59,9 +65,11 @@ def Proveedor(parent):
         tabla.column(col, width=ancho, anchor=anchor)
     tabla.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 10))
 
-    # Datos de ejemplo
-    tabla.insert("", "end", values=("1", "20-12345678-9", "Distribuidora García", "Av. Colón 123", "351-4112233", "garcia@mail.com"))
-    tabla.insert("", "end", values=("2", "30-98765432-1", "Bebidas del Sur S.A.", "Ruta 9 Km 5",  "351-5556677", "bdelsur@mail.com"))
+    def cargar_tabla():
+     tabla.delete(*tabla.get_children())
+    for fila in obtener_proveedores():
+        tabla.insert("", "end", values=fila)
+
 
     # ── Lógica de agregar ──
     def siguiente_id():
@@ -93,7 +101,12 @@ def Proveedor(parent):
 
         id_proveedor = str(siguiente_id())
 
-        tabla.insert("", tk.END, values=(id_proveedor, cuit, nombre, direccion, celular, email))
+        try:
+         agregar_proveedor(id_proveedor, cuit, nombre, direccion, celular, email)
+         cargar_tabla()
+        except Exception as e:
+         messagebox.showerror("Error", f"No se pudo guardar.\n{e}")
+
         for entry in (entrada_cuit, entrada_nombre, entrada_direccion, entrada_celular, entrada_email):
             entry.delete(0, tk.END)
 
@@ -150,7 +163,12 @@ def Proveedor(parent):
             return
 
         id_proveedor = tabla.item(seleccion[0], "values")[0]  # el ID no cambia
-        tabla.item(seleccion[0], values=(id_proveedor, cuit, nombre, direccion, celular, email))
+        try:
+         modificar_proveedor(id_proveedor, cuit, nombre, direccion, celular, email)
+         cargar_tabla()
+        except Exception as e:
+         messagebox.showerror("Error", f"No se pudo modificar.\n{e}")
+
         tabla.selection_remove(seleccion)
  
     # ── Lógica de borrar ──
@@ -171,8 +189,14 @@ def Proveedor(parent):
         )
 
         if confirmar:
-            tabla.delete(seleccion[0])
-            tabla.event_generate("<<TreeviewSelect>>")
+            id_proveedor = tabla.item(seleccion[0], "values")[0]
+            try:
+                eliminar_proveedor(id_proveedor)
+                cargar_tabla()
+            except Exception as e:
+                messagebox.showerror("Error", f"No se pudo borrar.\n{e}")
+            finally:
+                tabla.event_generate("<<TreeviewSelect>>")
 
     frame_botones = tk.Frame(form, bg="black")
     frame_botones.pack(anchor="w", pady=(0, 12))
@@ -257,9 +281,10 @@ def Compra(parent):
         tabla.column(col, width=ancho, anchor=anchor)
     tabla.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 10))
 
-    # Datos de ejemplo
-    tabla.insert("", "end", values=("1", "2026-10-05 09:30:00", "$15000.00", "1", "1"))
-    tabla.insert("", "end", values=("2", "2026-10-05 11:15:00", "$13200.00", "2", "1"))
+    def cargar_tabla():
+         tabla.delete(*tabla.get_children())
+         for fila in obtener_compras():
+            tabla.insert("", "end", values=fila)
 
     # ── Lógica de agregar ──
     def siguiente_id():
@@ -292,13 +317,18 @@ def Compra(parent):
         id_compra  = str(siguiente_id())
         fecha_hora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        tabla.insert("", tk.END, values=(
+        try:
+         agregar_compra(
             id_compra,
             fecha_hora,
             f"${monto_val:.2f}",
             id_proveedor,
             id_vendedor,
-        ))
+        )
+         cargar_tabla()
+        except Exception as e:
+         messagebox.showerror("Error", f"No se pudo guardar.\n{e}")
+
         for entry in (entrada_monto_total, entrada_id_proveedor, entrada_id_vendedor):
             entry.delete(0, tk.END)
 
@@ -354,13 +384,18 @@ def Compra(parent):
 
         # El ID y la fecha originales de la compra se conservan
         id_compra, fecha_hora = tabla.item(seleccion[0], "values")[:2]
-        tabla.item(seleccion[0], values=(
+        try:
+         modificar_compra(
             id_compra,
             fecha_hora,
             f"${monto_val:.2f}",
             id_proveedor,
             id_vendedor,
-        ))
+        )
+         cargar_tabla()
+        except Exception as e:
+         messagebox.showerror("Error", f"No se pudo modificar.\n{e}")
+
         tabla.selection_remove(seleccion)
 
     # ── Lógica de borrar ──
@@ -381,8 +416,15 @@ def Compra(parent):
         )
 
         if confirmar:
-            tabla.delete(seleccion[0])
-            tabla.event_generate("<<TreeviewSelect>>")
+            id_compra = valores[0]
+            try:
+                eliminar_compra(id_compra)
+                tabla.delete(seleccion[0])
+                cargar_tabla()
+            except Exception as e:
+                messagebox.showerror("Error", f"No se pudo borrar.\n{e}")
+            finally:
+                tabla.event_generate("<<TreeviewSelect>>")
 
     frame_botones = tk.Frame(form, bg="black")
     frame_botones.pack(anchor="w", pady=(0, 12))

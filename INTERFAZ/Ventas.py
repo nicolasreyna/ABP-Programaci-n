@@ -1,7 +1,13 @@
 import os
+import sys
 import tkinter as tk
 from tkinter import ttk, messagebox
 from datetime import datetime
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+from BASE_DE_DATOS.venta_db    import agregar_venta, obtener_ventas, modificar_venta, eliminar_venta
+from BASE_DE_DATOS.vendedor_db import agregar_vendedor, obtener_vendedores, modificar_vendedor, eliminar_vendedor
+
 
 carpeta_proyecto = os.path.dirname(__file__)
 ruta_logo = os.path.join(carpeta_proyecto, "LOGO APP.png")
@@ -64,8 +70,10 @@ def Ventas(parent):
     scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
     tabla.pack(fill=tk.BOTH, expand=True)
 
-    tabla.insert("", "end", values=("1", "2024-06-01 10:30", "150.00", "1", "1"))
-    tabla.insert("", "end", values=("2", "2024-06-02 14:45", "200.00", "2", "1"))
+    def cargar_tabla():
+        tabla.delete(*tabla.get_children())
+        for fila in obtener_ventas():
+           tabla.insert("", "end", values=fila)
 
     # ── Lógica de agregar ── (adentro de Ventas para acceder a entrada_* y tabla)
     def siguiente_id():
@@ -99,13 +107,19 @@ def Ventas(parent):
         fecha_hora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
       
 
-        tabla.insert("", tk.END, values=(
+        try:
+         agregar_venta(
             id_venta,
             fecha_hora,
             f"${monto_val:.2f}",
             id_cliente,
             id_vendedor,
-        ))
+        )
+
+         cargar_tabla()
+        except Exception as e:
+         messagebox.showerror("Error", f"No se pudo guardar.\n{e}")
+
 
         for entry in (entrada_monto_total, entrada_id_cliente, entrada_id_vendedor):
             entry.delete(0, tk.END)
@@ -163,13 +177,19 @@ def Ventas(parent):
 
         # El ID y la fecha originales de la venta se conservan
         id_venta, fecha_hora = tabla.item(seleccion[0], "values")[:2]
-        tabla.item(seleccion[0], values=(
-            id_venta,
-            fecha_hora,
-            f"${monto_val:.2f}",
-            id_cliente,
-            id_vendedor,
-        ))
+
+        try:
+            modificar_venta(
+                id_venta,
+                fecha_hora,
+                f"${monto_val:.2f}",
+                id_cliente,
+                id_vendedor,
+            )
+            cargar_tabla()
+        except Exception as e:
+            messagebox.showerror("Error", f"No se pudo modificar.\n{e}")
+
         tabla.selection_remove(seleccion)
 
     # ── Lógica de borrar ──
@@ -190,7 +210,13 @@ def Ventas(parent):
         )
 
         if confirmar:
-            tabla.delete(seleccion[0])
+            id_venta = valores[0]
+            try:
+                eliminar_venta(id_venta)
+                cargar_tabla()
+            except Exception as e:
+                messagebox.showerror("Error", f"No se pudo borrar.\n{e}")
+
             tabla.event_generate("<<TreeviewSelect>>")
 
 

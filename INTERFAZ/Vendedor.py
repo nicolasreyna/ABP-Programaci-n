@@ -1,6 +1,13 @@
 import os
+import sys
+
 import tkinter as tk
 from tkinter import ttk, messagebox
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+from BASE_DE_DATOS.venta_db    import agregar_venta, obtener_ventas, modificar_venta, eliminar_venta
+from BASE_DE_DATOS.vendedor_db import agregar_vendedor, obtener_vendedores, modificar_vendedor, eliminar_vendedor
+
 
 carpeta_proyecto = os.path.dirname(__file__)
 ruta_logo = os.path.join(carpeta_proyecto, "LOGO APP.png")
@@ -55,8 +62,10 @@ def Vendedor(parent):
         tabla.column(col, width=ancho, anchor=anchor)
     tabla.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 10))
 
-    # Dato de ejemplo — Don Mario
-    tabla.insert("", "end", values=("1", "Mario", "González", "20333444", "351-1234567"))
+    def cargar_tabla():
+         tabla.delete(*tabla.get_children())
+         for fila in obtener_vendedores():
+            tabla.insert("", "end", values=fila)
 
     # ── ID automático ──
     def siguiente_id():
@@ -100,7 +109,12 @@ def Vendedor(parent):
             return
 
         id_vendedor = str(siguiente_id())
-        tabla.insert("", tk.END, values=(id_vendedor, nombre, apellido, dni, celular))
+        try:
+         agregar_vendedor(id_vendedor, nombre, apellido, dni, celular)
+         cargar_tabla()
+        except Exception as e:
+         messagebox.showerror("Error", f"No se pudo guardar.\n{e}")
+
 
         for entry in (entrada_nombre, entrada_apellido, entrada_dni, entrada_celular):
             entry.delete(0, tk.END)
@@ -133,7 +147,12 @@ def Vendedor(parent):
             return
 
         id_vendedor = tabla.item(seleccion[0], "values")[0]  # el ID no cambia
-        tabla.item(seleccion[0], values=(id_vendedor, nombre, apellido, dni, celular))
+        try:
+         modificar_vendedor(id_vendedor, nombre, apellido, dni, celular)
+         cargar_tabla()
+        except Exception as e:
+         messagebox.showerror("Error", f"No se pudo modificar.\n{e}")
+
         tabla.selection_remove(seleccion)
 
     # ── Lógica de borrar ──
@@ -154,7 +173,14 @@ def Vendedor(parent):
         )
 
         if confirmar:
-            tabla.delete(seleccion[0])
+            id_vendedor = valores[0]
+            try:
+                eliminar_vendedor(id_vendedor)
+                cargar_tabla()
+                tabla.selection_remove(seleccion)
+            except Exception as e:
+                messagebox.showerror("Error", f"No se pudo borrar.\n{e}")
+
             tabla.event_generate("<<TreeviewSelect>>")
 
     # ── Botones ──

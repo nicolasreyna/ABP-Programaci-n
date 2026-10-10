@@ -1,7 +1,16 @@
-
+import sys
 import tkinter as tk
 from tkinter import messagebox, ttk
 import os
+
+# Agregás el path a BASE_DE_DATOS para poder importarlo
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'BASE_DE_DATOS'))
+
+from BASE_DE_DATOS import crear_tablas  # ← nueva línea
+from AbpAplicacion import mostrar_ventana_principal
+
+crear_tablas()  # ← nueva línea — si ya existen no hace nada
+
 
 
 # Importamos la función 'mostrar_ventana_principal' desde el archivo 'abp_aplicacion.py'
