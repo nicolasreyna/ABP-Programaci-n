@@ -54,9 +54,10 @@ def Cliente(parent: tk.Frame):
     combo_pago.pack(fill=tk.X, pady=(0, 10))
 
     # ── Tabla ──
-    columnas = ("dni", "Nombre", "Apellido", "Pago")
+    columnas = ("id_cliente","dni", "Nombre", "Apellido", "Pago")
     tabla = ttk.Treeview(left_frame, columns=columnas, show="headings", height=8, selectmode="browse")
     for col, ancho, anchor in [
+        ("id_cliente", 80,  "center"),
         ("dni",      100, "center"),
         ("Nombre",   130, "w"),
         ("Apellido", 130, "w"),
@@ -67,8 +68,12 @@ def Cliente(parent: tk.Frame):
     tabla.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 10))
 
     # Datos de ejemplo
-    tabla.insert("", "end", values=("30111222", "Juan",  "Pérez", "Transferencia"))
-    tabla.insert("", "end", values=("28555999", "María", "Gómez", "Débito"))
+    tabla.insert("", "end", values=("1", "30111222", "Juan",  "Pérez", "Transferencia"))
+    tabla.insert("", "end", values=("2", "28555999", "María", "Gómez", "Débito"))
+
+    def siguiente_id():
+        ids = [int(tabla.item(item, "values")[0]) for item in tabla.get_children()]
+        return max(ids) + 1 if ids else 1
 
     # ── Lógica de agregar ──
     def agregar_cliente():
@@ -88,7 +93,9 @@ def Cliente(parent: tk.Frame):
             messagebox.showwarning("Campos incompletos", "Por favor completá todos los campos.")
             return
 
-        tabla.insert("", tk.END, values=(dni, nombre, apellido, pago))
+        id_cliente = str(siguiente_id())
+
+        tabla.insert("", tk.END, values=(id_cliente, dni, nombre, apellido, pago))
         for entry in (entrada_dni, entrada_nombre, entrada_apellido):
             entry.delete(0, tk.END)
         combo_pago.set("")
@@ -104,7 +111,7 @@ def Cliente(parent: tk.Frame):
         if not seleccion:
             return
 
-        dni, nombre, apellido, pago = tabla.item(seleccion[0], "values")
+        id_cliente, dni, nombre, apellido, pago = tabla.item(seleccion[0], "values")
         entrada_dni.insert(0, str(dni))
         entrada_nombre.insert(0, nombre)
         entrada_apellido.insert(0, apellido)
@@ -139,7 +146,8 @@ def Cliente(parent: tk.Frame):
             )
             return
 
-        tabla.item(seleccion[0], values=(dni, nombre, apellido, pago))
+        id_cliente = tabla.item(seleccion[0], "values")[0]
+        tabla.item(seleccion[0], values=(id_cliente, dni, nombre, apellido, pago))
         tabla.selection_remove(seleccion)  # deselecciona y limpia el formulario
 
     # ── Lógica de borrar ──
@@ -154,7 +162,7 @@ def Cliente(parent: tk.Frame):
             return
 
         # Armamos el mensaje con los datos del cliente elegido
-        dni, nombre, apellido, _ = tabla.item(seleccion[0], "values")
+        id_cliente, dni, nombre, apellido, _ = tabla.item(seleccion[0], "values")
         confirmar = messagebox.askyesno(
             "Confirmar eliminación",
             f"¿Seguro que querés borrar a {nombre} {apellido} (DNI {dni})?",
@@ -414,7 +422,7 @@ def mostrar_ventana_principal():
         foreground="chartreuse2",
     ).pack(pady=15)
 
-    # Frame compartido donde viven Cliente y Producto lado a lado ← CLAVE
+  
     main_frame = tk.Frame(ventana, bg="black")
     main_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=10)
 

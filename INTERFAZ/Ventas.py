@@ -64,18 +64,20 @@ def Ventas(parent):
     scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
     tabla.pack(fill=tk.BOTH, expand=True)
 
-    tabla.insert("", "end", values=("1", "2024-06-01 10:30", "150.00", "101", "201"))
-    tabla.insert("", "end", values=("2", "2024-06-02 14:45", "200.00", "102", "202"))
+    tabla.insert("", "end", values=("1", "2024-06-01 10:30", "150.00", "1", "201"))
+    tabla.insert("", "end", values=("2", "2024-06-02 14:45", "200.00", "2", "202"))
 
     # ── Lógica de agregar ── (adentro de Ventas para acceder a entrada_* y tabla)
-    contador_id = [3]
+    def siguiente_id():
+            ids = [int(tabla.item(item, "values")[0]) for item in tabla.get_children()]
+            return max(ids) + 1 if ids else 1
 
     def agregar_venta():
         Monto_total = entrada_monto_total.get().strip()
-        Cliente_id = entrada_id_cliente.get().strip()
-        Vendedor_id = entrada_id_vendedor.get().strip()
+        id_cliente = entrada_id_cliente.get().strip()
+        id_vendedor = entrada_id_vendedor.get().strip()
 
-        if not all([Monto_total, Cliente_id, Vendedor_id]):
+        if not all([Monto_total, id_cliente, id_vendedor]):
             messagebox.showwarning("Error", "Todos los campos son obligatorios.")
             return
 
@@ -89,20 +91,20 @@ def Ventas(parent):
             messagebox.showerror("Monto inválido", "El monto total debe ser mayor a cero.")
             return
 
-        if not Cliente_id.isdigit() or not Vendedor_id.isdigit():
+        if not id_cliente.isdigit() or not id_vendedor.isdigit():
             messagebox.showerror("IDs inválidos", "El ID de cliente y vendedor deben ser números enteros.")
             return
 
-        id_venta = str(contador_id[0])
+        id_venta = str(siguiente_id())
         fecha_hora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        contador_id[0] += 1
+      
 
         tabla.insert("", tk.END, values=(
             id_venta,
             fecha_hora,
             f"${monto_val:.2f}",
-            Cliente_id,
-            Vendedor_id,
+            id_cliente,
+            id_vendedor,
         ))
 
         for entry in (entrada_monto_total, entrada_id_cliente, entrada_id_vendedor):
@@ -138,10 +140,10 @@ def Ventas(parent):
             return
 
         Monto_total = entrada_monto_total.get().strip()
-        Cliente_id  = entrada_id_cliente.get().strip()
-        Vendedor_id = entrada_id_vendedor.get().strip()
+        id_cliente  = entrada_id_cliente.get().strip()
+        id_vendedor = entrada_id_vendedor.get().strip()
 
-        if not all([Monto_total, Cliente_id, Vendedor_id]):
+        if not all([Monto_total, id_cliente, id_vendedor]):
             messagebox.showwarning("Error", "Todos los campos son obligatorios.")
             return
 
@@ -155,7 +157,7 @@ def Ventas(parent):
             messagebox.showerror("Monto inválido", "El monto total debe ser mayor a cero.")
             return
 
-        if not Cliente_id.isdigit() or not Vendedor_id.isdigit():
+        if not id_cliente.isdigit() or not id_vendedor.isdigit():
             messagebox.showerror("IDs inválidos", "El ID de cliente y vendedor deben ser números enteros.")
             return
 
@@ -165,8 +167,8 @@ def Ventas(parent):
             id_venta,
             fecha_hora,
             f"${monto_val:.2f}",
-            Cliente_id,
-            Vendedor_id,
+            id_cliente,
+            id_vendedor,
         ))
         tabla.selection_remove(seleccion)
 

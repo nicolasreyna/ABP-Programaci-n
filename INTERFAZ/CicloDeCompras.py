@@ -64,7 +64,9 @@ def Proveedor(parent):
     tabla.insert("", "end", values=("2", "30-98765432-1", "Bebidas del Sur S.A.", "Ruta 9 Km 5",  "351-5556677", "bdelsur@mail.com"))
 
     # ── Lógica de agregar ──
-    contador_id = [3]
+    def siguiente_id():
+        ids = [int(tabla.item(item, "values")[0]) for item in tabla.get_children()]
+        return max(ids) + 1 if ids else 1
 
     def agregar_proveedor():
         cuit      = entrada_cuit.get().strip()
@@ -89,8 +91,7 @@ def Proveedor(parent):
             messagebox.showerror("Email inválido", "Ingresá un email con formato válido.")
             return
 
-        id_proveedor = str(contador_id[0])
-        contador_id[0] += 1
+        id_proveedor = str(siguiente_id())
 
         tabla.insert("", tk.END, values=(id_proveedor, cuit, nombre, direccion, celular, email))
         for entry in (entrada_cuit, entrada_nombre, entrada_direccion, entrada_celular, entrada_email):
@@ -261,7 +262,9 @@ def Compra(parent):
     tabla.insert("", "end", values=("2", "2026-10-05 11:15:00", "$13200.00", "2", "1"))
 
     # ── Lógica de agregar ──
-    contador_id = [3]
+    def siguiente_id():
+            ids = [int(tabla.item(item, "values")[0]) for item in tabla.get_children()]
+            return max(ids) + 1 if ids else 1
 
     def agregar_compra():
         monto_total  = entrada_monto_total.get().strip()
@@ -286,9 +289,8 @@ def Compra(parent):
             messagebox.showerror("IDs inválidos", "El ID de proveedor y vendedor deben ser números enteros.")
             return
 
-        id_compra  = str(contador_id[0])
+        id_compra  = str(siguiente_id())
         fecha_hora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        contador_id[0] += 1
 
         tabla.insert("", tk.END, values=(
             id_compra,
