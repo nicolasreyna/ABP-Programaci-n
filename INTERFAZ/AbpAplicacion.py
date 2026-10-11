@@ -456,7 +456,7 @@ def mostrar_ventana_principal():
     ventana = tk.Tk()
     ventana.title("Almacen gestionario de Don Mario")
     ventana.minsize(1200, 500)
-    ventana.resizable(False, False)
+    ventana.resizable(True, True)
     ventana.configure(bg="black")
 
     try:
