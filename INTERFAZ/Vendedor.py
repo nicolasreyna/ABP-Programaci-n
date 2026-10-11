@@ -5,8 +5,12 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
-from BASE_DE_DATOS.venta_db    import agregar_venta, obtener_ventas, modificar_venta, eliminar_venta
-from BASE_DE_DATOS.vendedor_db import agregar_vendedor, obtener_vendedores, modificar_vendedor, eliminar_vendedor
+from BASE_DE_DATOS.vendedor_db import (
+    agregar_vendedor as db_agregar_vendedor,
+    obtener_vendedores as db_obtener_vendedores,
+    modificar_vendedor as db_modificar_vendedor,
+    eliminar_vendedor as db_eliminar_vendedor,
+)
 
 
 carpeta_proyecto = os.path.dirname(__file__)
@@ -64,7 +68,7 @@ def Vendedor(parent):
 
     def cargar_tabla():
          tabla.delete(*tabla.get_children())
-         for fila in obtener_vendedores():
+         for fila in db_obtener_vendedores():
             tabla.insert("", "end", values=fila)
 
     # ── ID automático ──
@@ -110,7 +114,7 @@ def Vendedor(parent):
 
         id_vendedor = str(siguiente_id())
         try:
-         agregar_vendedor(id_vendedor, nombre, apellido, dni, celular)
+         db_agregar_vendedor(id_vendedor, nombre, apellido, dni, celular)
          cargar_tabla()
         except Exception as e:
          messagebox.showerror("Error", f"No se pudo guardar.\n{e}")
@@ -148,7 +152,7 @@ def Vendedor(parent):
 
         id_vendedor = tabla.item(seleccion[0], "values")[0]  # el ID no cambia
         try:
-         modificar_vendedor(id_vendedor, nombre, apellido, dni, celular)
+         db_modificar_vendedor(id_vendedor, nombre, apellido, dni, celular)
          cargar_tabla()
         except Exception as e:
          messagebox.showerror("Error", f"No se pudo modificar.\n{e}")
@@ -175,7 +179,7 @@ def Vendedor(parent):
         if confirmar:
             id_vendedor = valores[0]
             try:
-                eliminar_vendedor(id_vendedor)
+                db_eliminar_vendedor(id_vendedor)
                 cargar_tabla()
                 tabla.selection_remove(seleccion)
             except Exception as e:
@@ -216,6 +220,8 @@ def Vendedor(parent):
         font=("Arial", 10, "bold"),
         cursor="hand2",
     ).pack(side=tk.LEFT)
+
+    cargar_tabla()
 
 
 def mostrar_ventana_vendedor():

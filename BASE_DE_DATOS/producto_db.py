@@ -1,40 +1,38 @@
-from database.conexion import obtener_conexion
+from .conexion import obtener_conexion
+
 
 def crear_tabla_producto():
     """Crea la tabla PRODUCTO si no existe."""
     sql = """
-    CREATE TABLE IF NOT EXISTS PRODUCTO (
-        codigo_producto VARCHAR(20) PRIMARY KEY,
-        nombre_producto VARCHAR(100) NOT NULL,
-        descripcion TEXT,
-        precio_actual NUMERIC(10,2) NOT NULL CHECK (precio_actual >= 0),
-        stock_actual INT NOT NULL DEFAULT 0 CHECK (stock_actual >= 0)
+    CREATE TABLE IF NOT EXISTS producto (
+        codigo TEXT PRIMARY KEY,
+        nombre TEXT NOT NULL,
+        precio REAL NOT NULL CHECK (precio >= 0),
+        stock INTEGER NOT NULL CHECK (stock >= 0)
     );
     """
     conexion = obtener_conexion()
-    cursor = conexion.cursor()
-    cursor.execute(sql)
+    conexion.execute(sql)
     conexion.commit()
     conexion.close()
 
-def agregar_producto(codigo_producto, nombre_producto, descripcion, precio_actual, stock_actual):
-    """Inserta un nuevo producto (Alta)."""
+
+def agregar_producto(codigo, nombre, precio, stock):
+    """Inserta un producto con los campos recibidos desde la interfaz."""
     sql = """
-    INSERT INTO PRODUCTO (codigo_producto, nombre_producto, descripcion, precio_actual, stock_actual)
-    VALUES (?, ?, ?, ?, ?);
+    INSERT INTO producto (codigo, nombre, precio, stock)
+    VALUES (?, ?, ?, ?);
     """
     conexion = obtener_conexion()
     cursor = conexion.cursor()
-    cursor.execute(sql, (codigo_producto, nombre_producto, descripcion, precio_actual, stock_actual))
+    cursor.execute(sql, (codigo, nombre, float(str(precio).replace("$", "")), stock))
     conexion.commit()
     conexion.close()
 
+
 def obtener_productos():
-    """Devuelve la lista de todos los productos (Consulta)."""
-    sql = """
-    SELECT codigo_producto, nombre_producto, descripcion, precio_actual, stock_actual 
-    FROM PRODUCTO;
-    """
+    """Devuelve código, nombre, precio y stock de cada producto."""
+    sql = "SELECT codigo, nombre, precio, stock FROM producto;"
     conexion = obtener_conexion()
     cursor = conexion.cursor()
     cursor.execute(sql)
@@ -42,24 +40,28 @@ def obtener_productos():
     conexion.close()
     return filas
 
-def modificar_producto(codigo_producto, nombre_producto, descripcion, precio_actual, stock_actual):
-    """Modifica los datos y stock de un producto existente."""
+
+def modificar_producto(codigo_anterior, codigo, nombre, precio, stock):
+    """Actualiza los campos del producto identificado por su código anterior."""
     sql = """
-    UPDATE PRODUCTO
-    SET nombre_producto = ?, descripcion = ?, precio_actual = ?, stock_actual = ?
-    WHERE codigo_producto = ?;
+    UPDATE producto
+    SET codigo = ?, nombre = ?, precio = ?, stock = ?
+    WHERE codigo = ?;
     """
     conexion = obtener_conexion()
     cursor = conexion.cursor()
-    cursor.execute(sql, (nombre_producto, descripcion, precio_actual, stock_actual, codigo_producto))
+    cursor.execute(
+        sql,
+        (codigo, nombre, float(str(precio).replace("$", "")), stock, codigo_anterior),
+    )
     conexion.commit()
     conexion.close()
 
-def eliminar_producto(codigo_producto):
-    """Elimina un producto por su código."""
-    sql = "DELETE FROM PRODUCTO WHERE codigo_producto = ?;"
+
+def eliminar_producto(codigo):
+    sql = "DELETE FROM producto WHERE codigo = ?;"
     conexion = obtener_conexion()
     cursor = conexion.cursor()
-    cursor.execute(sql, (codigo_producto,))
+    cursor.execute(sql, (codigo,))
     conexion.commit()
     conexion.close()

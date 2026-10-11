@@ -1,37 +1,39 @@
-from BASE_DE_DATOS.conexion import obtener_conexion
+from .conexion import obtener_conexion
+
 
 def crear_tabla_vendedor():
     sql = """
-    CREATE TABLE IF NOT EXISTS VENDEDOR (
+    CREATE TABLE IF NOT EXISTS vendedor (
         id_vendedor INTEGER PRIMARY KEY AUTOINCREMENT,
-        dni VARCHAR(10) NOT NULL UNIQUE,
-        nombre VARCHAR(100) NOT NULL,
-        apellido VARCHAR(100) NOT NULL,
-        celular VARCHAR(20),
-        turno VARCHAR(50)
+        nombre TEXT NOT NULL,
+        apellido TEXT NOT NULL,
+        dni TEXT NOT NULL UNIQUE,
+        celular TEXT NOT NULL
     );
     """
     conexion = obtener_conexion()
-    cursor = conexion.cursor()
-    cursor.execute(sql)
+    conexion.execute(sql)
     conexion.commit()
     conexion.close()
 
-def agregar_vendedor(dni, nombre, apellido, celular, turno):
+
+def agregar_vendedor(id_vendedor, nombre, apellido, dni, celular):
     sql = """
-    INSERT INTO VENDEDOR (dni, nombre, apellido, celular, turno)
+    INSERT INTO vendedor (id_vendedor, nombre, apellido, dni, celular)
     VALUES (?, ?, ?, ?, ?);
     """
     conexion = obtener_conexion()
     cursor = conexion.cursor()
-    cursor.execute(sql, (dni, nombre, apellido, celular, turno))
+    cursor.execute(sql, (id_vendedor, nombre, apellido, dni, celular))
     conexion.commit()
-    id_creado = cursor.lastrowid
     conexion.close()
-    return id_creado
+
 
 def obtener_vendedores():
-    sql = "SELECT id_vendedor, dni, nombre, apellido, celular, turno FROM VENDEDOR;"
+    sql = """
+    SELECT id_vendedor, nombre, apellido, dni, celular
+    FROM vendedor;
+    """
     conexion = obtener_conexion()
     cursor = conexion.cursor()
     cursor.execute(sql)
@@ -39,20 +41,22 @@ def obtener_vendedores():
     conexion.close()
     return filas
 
-def modificar_vendedor(id_vendedor, dni, nombre, apellido, celular, turno):
+
+def modificar_vendedor(id_vendedor, nombre, apellido, dni, celular):
     sql = """
-    UPDATE VENDEDOR
-    SET dni = ?, nombre = ?, apellido = ?, celular = ?, turno = ?
+    UPDATE vendedor
+    SET nombre = ?, apellido = ?, dni = ?, celular = ?
     WHERE id_vendedor = ?;
     """
     conexion = obtener_conexion()
     cursor = conexion.cursor()
-    cursor.execute(sql, (dni, nombre, apellido, celular, turno, id_vendedor))
+    cursor.execute(sql, (nombre, apellido, dni, celular, id_vendedor))
     conexion.commit()
     conexion.close()
 
+
 def eliminar_vendedor(id_vendedor):
-    sql = "DELETE FROM VENDEDOR WHERE id_vendedor = ?;"
+    sql = "DELETE FROM vendedor WHERE id_vendedor = ?;"
     conexion = obtener_conexion()
     cursor = conexion.cursor()
     cursor.execute(sql, (id_vendedor,))

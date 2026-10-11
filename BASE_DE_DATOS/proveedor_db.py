@@ -1,37 +1,40 @@
-from BASE_DE_DATOS.conexion import obtener_conexion
+from .conexion import obtener_conexion
+
 
 def crear_tabla_proveedor():
     sql = """
-    CREATE TABLE IF NOT EXISTS PROVEEDOR (
+    CREATE TABLE IF NOT EXISTS proveedor (
         id_proveedor INTEGER PRIMARY KEY AUTOINCREMENT,
-        cuit VARCHAR(15) NOT NULL UNIQUE,
-        nombre VARCHAR(100) NOT NULL,
-        direccion VARCHAR(150),
-        celular VARCHAR(20),
-        email VARCHAR(100)
+        cuit TEXT NOT NULL UNIQUE,
+        nombre TEXT NOT NULL,
+        direccion TEXT NOT NULL,
+        celular TEXT NOT NULL,
+        email TEXT NOT NULL
     );
     """
     conexion = obtener_conexion()
-    cursor = conexion.cursor()
-    cursor.execute(sql)
+    conexion.execute(sql)
     conexion.commit()
     conexion.close()
 
-def agregar_proveedor(cuit, nombre, direccion, celular, email):
+
+def agregar_proveedor(id_proveedor, cuit, nombre, direccion, celular, email):
     sql = """
-    INSERT INTO PROVEEDOR (cuit, nombre, direccion, celular, email)
-    VALUES (?, ?, ?, ?, ?);
+    INSERT INTO proveedor (id_proveedor, cuit, nombre, direccion, celular, email)
+    VALUES (?, ?, ?, ?, ?, ?);
     """
     conexion = obtener_conexion()
     cursor = conexion.cursor()
-    cursor.execute(sql, (cuit, nombre, direccion, celular, email))
+    cursor.execute(sql, (id_proveedor, cuit, nombre, direccion, celular, email))
     conexion.commit()
-    id_creado = cursor.lastrowid
     conexion.close()
-    return id_creado
+
 
 def obtener_proveedores():
-    sql = "SELECT id_proveedor, cuit, nombre, direccion, celular, email FROM PROVEEDOR;"
+    sql = """
+    SELECT id_proveedor, cuit, nombre, direccion, celular, email
+    FROM proveedor;
+    """
     conexion = obtener_conexion()
     cursor = conexion.cursor()
     cursor.execute(sql)
@@ -39,9 +42,10 @@ def obtener_proveedores():
     conexion.close()
     return filas
 
+
 def modificar_proveedor(id_proveedor, cuit, nombre, direccion, celular, email):
     sql = """
-    UPDATE PROVEEDOR
+    UPDATE proveedor
     SET cuit = ?, nombre = ?, direccion = ?, celular = ?, email = ?
     WHERE id_proveedor = ?;
     """
@@ -51,8 +55,9 @@ def modificar_proveedor(id_proveedor, cuit, nombre, direccion, celular, email):
     conexion.commit()
     conexion.close()
 
+
 def eliminar_proveedor(id_proveedor):
-    sql = "DELETE FROM PROVEEDOR WHERE id_proveedor = ?;"
+    sql = "DELETE FROM proveedor WHERE id_proveedor = ?;"
     conexion = obtener_conexion()
     cursor = conexion.cursor()
     cursor.execute(sql, (id_proveedor,))

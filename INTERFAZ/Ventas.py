@@ -5,8 +5,18 @@ from tkinter import ttk, messagebox
 from datetime import datetime
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
-from BASE_DE_DATOS.venta_db    import agregar_venta, obtener_ventas, modificar_venta, eliminar_venta
-from BASE_DE_DATOS.vendedor_db import agregar_vendedor, obtener_vendedores, modificar_vendedor, eliminar_vendedor
+from BASE_DE_DATOS.venta_db import (
+    agregar_venta as db_agregar_venta,
+    obtener_ventas as db_obtener_ventas,
+    modificar_venta as db_modificar_venta,
+    eliminar_venta as db_eliminar_venta,
+)
+from BASE_DE_DATOS.vendedor_db import (
+    agregar_vendedor as db_agregar_vendedor,
+    obtener_vendedores as db_obtener_vendedores,
+    modificar_vendedor as db_modificar_vendedor,
+    eliminar_vendedor as db_eliminar_vendedor,
+)
 
 
 carpeta_proyecto = os.path.dirname(__file__)
@@ -72,7 +82,7 @@ def Ventas(parent):
 
     def cargar_tabla():
         tabla.delete(*tabla.get_children())
-        for fila in obtener_ventas():
+        for fila in db_obtener_ventas():
            tabla.insert("", "end", values=fila)
 
     # ── Lógica de agregar ── (adentro de Ventas para acceder a entrada_* y tabla)
@@ -108,7 +118,7 @@ def Ventas(parent):
       
 
         try:
-         agregar_venta(
+         db_agregar_venta(
             id_venta,
             fecha_hora,
             f"${monto_val:.2f}",
@@ -179,7 +189,7 @@ def Ventas(parent):
         id_venta, fecha_hora = tabla.item(seleccion[0], "values")[:2]
 
         try:
-            modificar_venta(
+            db_modificar_venta(
                 id_venta,
                 fecha_hora,
                 f"${monto_val:.2f}",
@@ -212,7 +222,7 @@ def Ventas(parent):
         if confirmar:
             id_venta = valores[0]
             try:
-                eliminar_venta(id_venta)
+                db_eliminar_venta(id_venta)
                 cargar_tabla()
             except Exception as e:
                 messagebox.showerror("Error", f"No se pudo borrar.\n{e}")
@@ -254,6 +264,8 @@ def Ventas(parent):
         font=("Arial", 10, "bold"),
         cursor="hand2",
     ).pack(side=tk.LEFT)
+
+    cargar_tabla()
 
 
 def mostrar_ventana_ventas():

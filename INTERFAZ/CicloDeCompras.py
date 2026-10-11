@@ -5,8 +5,18 @@ from tkinter import ttk, messagebox
 from datetime import datetime
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
-from BASE_DE_DATOS.proveedor_db import agregar_proveedor, obtener_proveedores, modificar_proveedor, eliminar_proveedor
-from BASE_DE_DATOS.compra_db    import agregar_compra, obtener_compras, modificar_compra, eliminar_compra
+from BASE_DE_DATOS.proveedor_db import (
+    agregar_proveedor as db_agregar_proveedor,
+    obtener_proveedores as db_obtener_proveedores,
+    modificar_proveedor as db_modificar_proveedor,
+    eliminar_proveedor as db_eliminar_proveedor,
+)
+from BASE_DE_DATOS.compra_db import (
+    agregar_compra as db_agregar_compra,
+    obtener_compras as db_obtener_compras,
+    modificar_compra as db_modificar_compra,
+    eliminar_compra as db_eliminar_compra,
+)
 
 
 carpeta_proyecto = os.path.dirname(__file__)
@@ -66,9 +76,9 @@ def Proveedor(parent):
     tabla.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 10))
 
     def cargar_tabla():
-     tabla.delete(*tabla.get_children())
-    for fila in obtener_proveedores():
-        tabla.insert("", "end", values=fila)
+        tabla.delete(*tabla.get_children())
+        for fila in db_obtener_proveedores():
+            tabla.insert("", "end", values=fila)
 
 
     # ── Lógica de agregar ──
@@ -102,7 +112,7 @@ def Proveedor(parent):
         id_proveedor = str(siguiente_id())
 
         try:
-         agregar_proveedor(id_proveedor, cuit, nombre, direccion, celular, email)
+         db_agregar_proveedor(id_proveedor, cuit, nombre, direccion, celular, email)
          cargar_tabla()
         except Exception as e:
          messagebox.showerror("Error", f"No se pudo guardar.\n{e}")
@@ -164,7 +174,7 @@ def Proveedor(parent):
 
         id_proveedor = tabla.item(seleccion[0], "values")[0]  # el ID no cambia
         try:
-         modificar_proveedor(id_proveedor, cuit, nombre, direccion, celular, email)
+         db_modificar_proveedor(id_proveedor, cuit, nombre, direccion, celular, email)
          cargar_tabla()
         except Exception as e:
          messagebox.showerror("Error", f"No se pudo modificar.\n{e}")
@@ -191,7 +201,7 @@ def Proveedor(parent):
         if confirmar:
             id_proveedor = tabla.item(seleccion[0], "values")[0]
             try:
-                eliminar_proveedor(id_proveedor)
+                db_eliminar_proveedor(id_proveedor)
                 cargar_tabla()
             except Exception as e:
                 messagebox.showerror("Error", f"No se pudo borrar.\n{e}")
@@ -231,6 +241,7 @@ def Proveedor(parent):
         cursor="hand2",
     ).pack(side=tk.LEFT)   
 
+    cargar_tabla()
 
 
 def Compra(parent):
@@ -283,7 +294,7 @@ def Compra(parent):
 
     def cargar_tabla():
          tabla.delete(*tabla.get_children())
-         for fila in obtener_compras():
+         for fila in db_obtener_compras():
             tabla.insert("", "end", values=fila)
 
     # ── Lógica de agregar ──
@@ -318,7 +329,7 @@ def Compra(parent):
         fecha_hora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         try:
-         agregar_compra(
+         db_agregar_compra(
             id_compra,
             fecha_hora,
             f"${monto_val:.2f}",
@@ -385,7 +396,7 @@ def Compra(parent):
         # El ID y la fecha originales de la compra se conservan
         id_compra, fecha_hora = tabla.item(seleccion[0], "values")[:2]
         try:
-         modificar_compra(
+         db_modificar_compra(
             id_compra,
             fecha_hora,
             f"${monto_val:.2f}",
@@ -418,7 +429,7 @@ def Compra(parent):
         if confirmar:
             id_compra = valores[0]
             try:
-                eliminar_compra(id_compra)
+                db_eliminar_compra(id_compra)
                 tabla.delete(seleccion[0])
                 cargar_tabla()
             except Exception as e:
@@ -458,6 +469,8 @@ def Compra(parent):
         font=("Arial", 10, "bold"),
         cursor="hand2",
     ).pack(side=tk.LEFT)
+
+    cargar_tabla()
 
 
 

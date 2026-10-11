@@ -76,9 +76,9 @@ def Cliente(parent: tk.Frame):
     tabla.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 10))
 
     def cargar_tabla():
-     tabla.delete(*tabla.get_children())
-    for fila in db_obtener_clientes():
-        tabla.insert("", "end", values=fila)
+        tabla.delete(*tabla.get_children())
+        for fila in db_obtener_clientes():
+            tabla.insert("", "end", values=fila)
 
 
     def siguiente_id():
@@ -236,6 +236,8 @@ def Cliente(parent: tk.Frame):
         cursor="hand2",
     ).pack(side=tk.LEFT)
 
+    cargar_tabla()
+
 
 def Producto(parent: tk.Frame):
     """Sección de gestión de productos (panel derecho)."""
@@ -286,9 +288,9 @@ def Producto(parent: tk.Frame):
     tabla.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 10))
 
     def cargar_tabla():
-     tabla.delete(*tabla.get_children())
-    for fila in db_obtener_productos():
-        tabla.insert("", "end", values=fila)
+        tabla.delete(*tabla.get_children())
+        for fila in db_obtener_productos():
+            tabla.insert("", "end", values=fila)
 
 
     def agregar_producto():
@@ -397,7 +399,7 @@ def Producto(parent: tk.Frame):
             )
             return
 
-        id_producto, codigo, nombre, _, _ = tabla.item(seleccion[0], "values")
+        codigo, nombre, _, _ = tabla.item(seleccion[0], "values")
         confirmar = messagebox.askyesno(
             "Confirmar eliminación",
             f"¿Seguro que querés borrar el producto {nombre} (código {codigo})?",
@@ -405,7 +407,7 @@ def Producto(parent: tk.Frame):
 
         if confirmar:
             try:
-                db_eliminar_producto(id_producto)
+                db_eliminar_producto(codigo)
                 cargar_tabla()
             except Exception as e:
                 messagebox.showerror("Error", f"No se pudo borrar.\n{e}")
@@ -445,6 +447,8 @@ def Producto(parent: tk.Frame):
         font=("Arial", 10, "bold"),
         cursor="hand2",
     ).pack(side=tk.LEFT)
+
+    cargar_tabla()
 
     
 

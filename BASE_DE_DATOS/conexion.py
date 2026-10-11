@@ -2,12 +2,12 @@
 import sqlite3
 import os
 
-# Nombre del archivo de base de datos
-DB_NAME = "almacen.db"
+# Guardar la base junto al proyecto, independientemente de desde dónde se inicie la app.
+DB_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "almacen.db")
 
 def obtener_conexion():
     """Crea o se conecta a la base de datos SQLite y activa claves foráneas."""
-    conexion = sqlite3.connect(DB_NAME)
+    conexion = sqlite3.connect(DB_PATH)
     # Habilitar soporte para Foreign Keys en SQLite
     conexion.execute("PRAGMA foreign_keys = ON;")
     return conexion
@@ -69,4 +69,3 @@ def crear_tablas():
 
     con.commit()
     con.close()
-

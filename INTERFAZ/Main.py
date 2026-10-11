@@ -4,21 +4,17 @@ from tkinter import messagebox, ttk
 import os
 
 # Agregás el path a BASE_DE_DATOS para poder importarlo
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'BASE_DE_DATOS'))
+carpeta_proyecto = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, carpeta_proyecto)
 
-from BASE_DE_DATOS import crear_tablas  # ← nueva línea
+from BASE_DE_DATOS.conexion import crear_tablas
 from AbpAplicacion import mostrar_ventana_principal
 
-crear_tablas()  # ← nueva línea — si ya existen no hace nada
+crear_tablas()
 
 
-
-# Importamos la función 'mostrar_ventana_principal' desde el archivo 'abp_aplicacion.py'
-from AbpAplicacion import mostrar_ventana_principal
-
-
-carpeta_proyecto = os.path.dirname(__file__)
-ruta_logo = os.path.join(carpeta_proyecto, "LOGO APP.png")
+carpeta_interfaz = os.path.dirname(os.path.abspath(__file__))
+ruta_logo = os.path.join(carpeta_interfaz, "LOGO APP.png")
 
 intentos_restantes = 3
 
