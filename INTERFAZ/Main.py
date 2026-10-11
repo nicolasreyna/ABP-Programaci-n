@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import messagebox, ttk
 import os
 
-# Agregás el path a BASE_DE_DATOS para poder importarlo
+
 carpeta_proyecto = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, carpeta_proyecto)
 
