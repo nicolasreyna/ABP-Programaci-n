@@ -1,4 +1,4 @@
-from .conexion import obtener_conexion
+from .conexion import conexion_segura
 
 
 def crear_tabla_cliente():
@@ -11,10 +11,8 @@ def crear_tabla_cliente():
         metodo_pago TEXT NOT NULL
     );
     """
-    conexion = obtener_conexion()
-    conexion.execute(sql)
-    conexion.commit()
-    conexion.close()
+    with conexion_segura() as conexion:
+        conexion.execute(sql)
 
 
 def agregar_cliente(dni, nombre, apellido, pago):
@@ -22,22 +20,19 @@ def agregar_cliente(dni, nombre, apellido, pago):
     INSERT INTO cliente (dni, nombre, apellido, metodo_pago)
     VALUES (?, ?, ?, ?);
     """
-    conexion = obtener_conexion()
-    cursor = conexion.cursor()
-    cursor.execute(sql, (dni, nombre, apellido, pago))
-    conexion.commit()
-    id_creado = cursor.lastrowid
-    conexion.close()
+    with conexion_segura() as conexion:
+        cursor = conexion.cursor()
+        cursor.execute(sql, (dni, nombre, apellido, pago))
+        id_creado = cursor.lastrowid
     return id_creado
 
 
 def obtener_clientes():
     sql = "SELECT id_cliente, dni, nombre, apellido, metodo_pago FROM cliente;"
-    conexion = obtener_conexion()
-    cursor = conexion.cursor()
-    cursor.execute(sql)
-    registros = cursor.fetchall()
-    conexion.close()
+    with conexion_segura() as conexion:
+        cursor = conexion.cursor()
+        cursor.execute(sql)
+        registros = cursor.fetchall()
     return registros
 
 
@@ -47,17 +42,13 @@ def modificar_cliente(id_cliente, dni, nombre, apellido, pago):
     SET dni = ?, nombre = ?, apellido = ?, metodo_pago = ?
     WHERE id_cliente = ?;
     """
-    conexion = obtener_conexion()
-    cursor = conexion.cursor()
-    cursor.execute(sql, (dni, nombre, apellido, pago, id_cliente))
-    conexion.commit()
-    conexion.close()
+    with conexion_segura() as conexion:
+        cursor = conexion.cursor()
+        cursor.execute(sql, (dni, nombre, apellido, pago, id_cliente))
 
 
 def eliminar_cliente(id_cliente):
     sql = "DELETE FROM cliente WHERE id_cliente = ?;"
-    conexion = obtener_conexion()
-    cursor = conexion.cursor()
-    cursor.execute(sql, (id_cliente,))
-    conexion.commit()
-    conexion.close()
+    with conexion_segura() as conexion:
+        cursor = conexion.cursor()
+        cursor.execute(sql, (id_cliente,))

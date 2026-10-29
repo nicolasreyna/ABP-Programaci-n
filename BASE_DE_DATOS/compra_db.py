@@ -1,4 +1,4 @@
-from .conexion import obtener_conexion
+from .conexion import conexion_segura
 
 
 def crear_tabla_compra():
@@ -11,10 +11,8 @@ def crear_tabla_compra():
         id_vendedor INTEGER NOT NULL REFERENCES vendedor(id_vendedor)
     );
     """
-    conexion = obtener_conexion()
-    conexion.execute(sql)
-    conexion.commit()
-    conexion.close()
+    with conexion_segura() as conexion:
+        conexion.execute(sql)
 
 
 def agregar_compra(id_compra, fecha_hora, monto_total, id_proveedor, id_vendedor):
@@ -22,21 +20,19 @@ def agregar_compra(id_compra, fecha_hora, monto_total, id_proveedor, id_vendedor
     INSERT INTO compra (id_compra, fecha_hora, monto_total, id_proveedor, id_vendedor)
     VALUES (?, ?, ?, ?, ?);
     """
-    conexion = obtener_conexion()
-    cursor = conexion.cursor()
-    cursor.execute(
-        sql,
-        (
-            id_compra,
-            fecha_hora,
-            float(str(monto_total).replace("$", "")),
-            id_proveedor,
-            id_vendedor,
-        ),
-    )
-    conexion.commit()
-    id_creado = cursor.lastrowid
-    conexion.close()
+    with conexion_segura() as conexion:
+        cursor = conexion.cursor()
+        cursor.execute(
+            sql,
+            (
+                id_compra,
+                fecha_hora,
+                float(str(monto_total).replace("$", "")),
+                id_proveedor,
+                id_vendedor,
+            ),
+        )
+        id_creado = cursor.lastrowid
     return id_creado
 
 
@@ -45,11 +41,10 @@ def obtener_compras():
     SELECT id_compra, fecha_hora, monto_total, id_proveedor, id_vendedor
     FROM compra;
     """
-    conexion = obtener_conexion()
-    cursor = conexion.cursor()
-    cursor.execute(sql)
-    filas = cursor.fetchall()
-    conexion.close()
+    with conexion_segura() as conexion:
+        cursor = conexion.cursor()
+        cursor.execute(sql)
+        filas = cursor.fetchall()
     return filas
 
 
@@ -59,26 +54,22 @@ def modificar_compra(id_compra, fecha_hora, monto_total, id_proveedor, id_vended
     SET fecha_hora = ?, monto_total = ?, id_proveedor = ?, id_vendedor = ?
     WHERE id_compra = ?;
     """
-    conexion = obtener_conexion()
-    cursor = conexion.cursor()
-    cursor.execute(
-        sql,
-        (
-            fecha_hora,
-            float(str(monto_total).replace("$", "")),
-            id_proveedor,
-            id_vendedor,
-            id_compra,
-        ),
-    )
-    conexion.commit()
-    conexion.close()
+    with conexion_segura() as conexion:
+        cursor = conexion.cursor()
+        cursor.execute(
+            sql,
+            (
+                fecha_hora,
+                float(str(monto_total).replace("$", "")),
+                id_proveedor,
+                id_vendedor,
+                id_compra,
+            ),
+        )
 
 
 def eliminar_compra(id_compra):
     sql = "DELETE FROM compra WHERE id_compra = ?;"
-    conexion = obtener_conexion()
-    cursor = conexion.cursor()
-    cursor.execute(sql, (id_compra,))
-    conexion.commit()
-    conexion.close()
+    with conexion_segura() as conexion:
+        cursor = conexion.cursor()
+        cursor.execute(sql, (id_compra,))

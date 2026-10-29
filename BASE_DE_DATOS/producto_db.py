@@ -1,4 +1,4 @@
-from .conexion import obtener_conexion
+from .conexion import conexion_segura
 
 
 def crear_tabla_producto():
@@ -11,10 +11,8 @@ def crear_tabla_producto():
         stock INTEGER NOT NULL CHECK (stock >= 0)
     );
     """
-    conexion = obtener_conexion()
-    conexion.execute(sql)
-    conexion.commit()
-    conexion.close()
+    with conexion_segura() as conexion:
+        conexion.execute(sql)
 
 
 def agregar_producto(codigo, nombre, precio, stock):
@@ -23,21 +21,18 @@ def agregar_producto(codigo, nombre, precio, stock):
     INSERT INTO producto (codigo, nombre, precio, stock)
     VALUES (?, ?, ?, ?);
     """
-    conexion = obtener_conexion()
-    cursor = conexion.cursor()
-    cursor.execute(sql, (codigo, nombre, float(str(precio).replace("$", "")), stock))
-    conexion.commit()
-    conexion.close()
+    with conexion_segura() as conexion:
+        cursor = conexion.cursor()
+        cursor.execute(sql, (codigo, nombre, float(str(precio).replace("$", "")), stock))
 
 
 def obtener_productos():
     """Devuelve código, nombre, precio y stock de cada producto."""
     sql = "SELECT codigo, nombre, precio, stock FROM producto;"
-    conexion = obtener_conexion()
-    cursor = conexion.cursor()
-    cursor.execute(sql)
-    filas = cursor.fetchall()
-    conexion.close()
+    with conexion_segura() as conexion:
+        cursor = conexion.cursor()
+        cursor.execute(sql)
+        filas = cursor.fetchall()
     return filas
 
 
@@ -48,20 +43,16 @@ def modificar_producto(codigo_anterior, codigo, nombre, precio, stock):
     SET codigo = ?, nombre = ?, precio = ?, stock = ?
     WHERE codigo = ?;
     """
-    conexion = obtener_conexion()
-    cursor = conexion.cursor()
-    cursor.execute(
-        sql,
-        (codigo, nombre, float(str(precio).replace("$", "")), stock, codigo_anterior),
-    )
-    conexion.commit()
-    conexion.close()
+    with conexion_segura() as conexion:
+        cursor = conexion.cursor()
+        cursor.execute(
+            sql,
+            (codigo, nombre, float(str(precio).replace("$", "")), stock, codigo_anterior),
+        )
 
 
 def eliminar_producto(codigo):
     sql = "DELETE FROM producto WHERE codigo = ?;"
-    conexion = obtener_conexion()
-    cursor = conexion.cursor()
-    cursor.execute(sql, (codigo,))
-    conexion.commit()
-    conexion.close()
+    with conexion_segura() as conexion:
+        cursor = conexion.cursor()
+        cursor.execute(sql, (codigo,))

@@ -1,4 +1,4 @@
-from .conexion import obtener_conexion
+from .conexion import conexion_segura
 
 
 def crear_tabla_proveedor():
@@ -12,10 +12,8 @@ def crear_tabla_proveedor():
         email TEXT NOT NULL
     );
     """
-    conexion = obtener_conexion()
-    conexion.execute(sql)
-    conexion.commit()
-    conexion.close()
+    with conexion_segura() as conexion:
+        conexion.execute(sql)
 
 
 def agregar_proveedor(id_proveedor, cuit, nombre, direccion, celular, email):
@@ -23,11 +21,9 @@ def agregar_proveedor(id_proveedor, cuit, nombre, direccion, celular, email):
     INSERT INTO proveedor (id_proveedor, cuit, nombre, direccion, celular, email)
     VALUES (?, ?, ?, ?, ?, ?);
     """
-    conexion = obtener_conexion()
-    cursor = conexion.cursor()
-    cursor.execute(sql, (id_proveedor, cuit, nombre, direccion, celular, email))
-    conexion.commit()
-    conexion.close()
+    with conexion_segura() as conexion:
+        cursor = conexion.cursor()
+        cursor.execute(sql, (id_proveedor, cuit, nombre, direccion, celular, email))
 
 
 def obtener_proveedores():
@@ -35,11 +31,10 @@ def obtener_proveedores():
     SELECT id_proveedor, cuit, nombre, direccion, celular, email
     FROM proveedor;
     """
-    conexion = obtener_conexion()
-    cursor = conexion.cursor()
-    cursor.execute(sql)
-    filas = cursor.fetchall()
-    conexion.close()
+    with conexion_segura() as conexion:
+        cursor = conexion.cursor()
+        cursor.execute(sql)
+        filas = cursor.fetchall()
     return filas
 
 
@@ -49,17 +44,13 @@ def modificar_proveedor(id_proveedor, cuit, nombre, direccion, celular, email):
     SET cuit = ?, nombre = ?, direccion = ?, celular = ?, email = ?
     WHERE id_proveedor = ?;
     """
-    conexion = obtener_conexion()
-    cursor = conexion.cursor()
-    cursor.execute(sql, (cuit, nombre, direccion, celular, email, id_proveedor))
-    conexion.commit()
-    conexion.close()
+    with conexion_segura() as conexion:
+        cursor = conexion.cursor()
+        cursor.execute(sql, (cuit, nombre, direccion, celular, email, id_proveedor))
 
 
 def eliminar_proveedor(id_proveedor):
     sql = "DELETE FROM proveedor WHERE id_proveedor = ?;"
-    conexion = obtener_conexion()
-    cursor = conexion.cursor()
-    cursor.execute(sql, (id_proveedor,))
-    conexion.commit()
-    conexion.close()
+    with conexion_segura() as conexion:
+        cursor = conexion.cursor()
+        cursor.execute(sql, (id_proveedor,))

@@ -1,6 +1,7 @@
 # database/conexion.py
 import sqlite3
 import os
+from contextlib import contextmanager
 
 # Guardar la base junto al proyecto, independientemente de desde dónde se inicie la app.
 DB_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "almacen.db")
@@ -12,12 +13,21 @@ def obtener_conexion():
     conexion.execute("PRAGMA foreign_keys = ON;")
     return conexion
 
+@contextmanager
+def conexion_segura():
+    """Gestiona la transacción y garantiza cerrar la conexión."""
+    conexion = obtener_conexion()
+    try:
+        with conexion:
+            yield conexion
+    finally:
+        conexion.close()
+
 def crear_tablas():
     """Crea todas las tablas si no existen. Se llama una sola vez al iniciar."""
-    con = obtener_conexion()
-    cur = con.cursor()
-
-    cur.executescript("""
+    with conexion_segura() as con:
+        cur = con.cursor()
+        cur.executescript("""
         CREATE TABLE IF NOT EXISTS vendedor (
             id_vendedor INTEGER PRIMARY KEY AUTOINCREMENT,
             nombre      TEXT    NOT NULL,
@@ -65,7 +75,4 @@ def crear_tablas():
             id_cliente  INTEGER NOT NULL REFERENCES cliente(id_cliente),
             id_vendedor INTEGER NOT NULL REFERENCES vendedor(id_vendedor)
         );
-    """)
-
-    con.commit()
-    con.close()
+        """)

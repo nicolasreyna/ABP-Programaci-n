@@ -1,4 +1,4 @@
-from .conexion import obtener_conexion
+from .conexion import conexion_segura
 
 
 def crear_tabla_vendedor():
@@ -11,10 +11,8 @@ def crear_tabla_vendedor():
         celular TEXT NOT NULL
     );
     """
-    conexion = obtener_conexion()
-    conexion.execute(sql)
-    conexion.commit()
-    conexion.close()
+    with conexion_segura() as conexion:
+        conexion.execute(sql)
 
 
 def agregar_vendedor(id_vendedor, nombre, apellido, dni, celular):
@@ -22,11 +20,9 @@ def agregar_vendedor(id_vendedor, nombre, apellido, dni, celular):
     INSERT INTO vendedor (id_vendedor, nombre, apellido, dni, celular)
     VALUES (?, ?, ?, ?, ?);
     """
-    conexion = obtener_conexion()
-    cursor = conexion.cursor()
-    cursor.execute(sql, (id_vendedor, nombre, apellido, dni, celular))
-    conexion.commit()
-    conexion.close()
+    with conexion_segura() as conexion:
+        cursor = conexion.cursor()
+        cursor.execute(sql, (id_vendedor, nombre, apellido, dni, celular))
 
 
 def obtener_vendedores():
@@ -34,11 +30,10 @@ def obtener_vendedores():
     SELECT id_vendedor, nombre, apellido, dni, celular
     FROM vendedor;
     """
-    conexion = obtener_conexion()
-    cursor = conexion.cursor()
-    cursor.execute(sql)
-    filas = cursor.fetchall()
-    conexion.close()
+    with conexion_segura() as conexion:
+        cursor = conexion.cursor()
+        cursor.execute(sql)
+        filas = cursor.fetchall()
     return filas
 
 
@@ -48,17 +43,13 @@ def modificar_vendedor(id_vendedor, nombre, apellido, dni, celular):
     SET nombre = ?, apellido = ?, dni = ?, celular = ?
     WHERE id_vendedor = ?;
     """
-    conexion = obtener_conexion()
-    cursor = conexion.cursor()
-    cursor.execute(sql, (nombre, apellido, dni, celular, id_vendedor))
-    conexion.commit()
-    conexion.close()
+    with conexion_segura() as conexion:
+        cursor = conexion.cursor()
+        cursor.execute(sql, (nombre, apellido, dni, celular, id_vendedor))
 
 
 def eliminar_vendedor(id_vendedor):
     sql = "DELETE FROM vendedor WHERE id_vendedor = ?;"
-    conexion = obtener_conexion()
-    cursor = conexion.cursor()
-    cursor.execute(sql, (id_vendedor,))
-    conexion.commit()
-    conexion.close()
+    with conexion_segura() as conexion:
+        cursor = conexion.cursor()
+        cursor.execute(sql, (id_vendedor,))
