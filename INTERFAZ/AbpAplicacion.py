@@ -126,7 +126,7 @@ def Cliente(parent: tk.Frame):
         if not seleccion:
             return
 
-        id_cliente, dni, nombre, apellido, pago = tabla.item(seleccion[0], "values")
+        dni, nombre, apellido, pago = tabla.item(seleccion[0], "values")
         entrada_dni.insert(0, str(dni))
         entrada_nombre.insert(0, nombre)
         entrada_apellido.insert(0, apellido)

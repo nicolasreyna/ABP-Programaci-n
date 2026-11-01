@@ -15,7 +15,6 @@ Seguimos Ahora con la carpeta Base De Datos, Aqui se realizaron 3 cosas claves. 
 
 Para ejecutar la aplicacion, se tiene que dirigir a Main.py y simplemente correrlo desde allí. La contraseña es 1234. 
 
-*IMPORTANTE, LA APLICACION ESTA SUJETA A FOREIGN KEYS = ON, POR ENDE SI SE BORRA UN REGISTRO Y ESTA SUJETO A OTRA TABLA COMO UNA CLAVE FORAÑEA, NO TE VA A DEJAR BORRARLA Y DESPUES SE TE BLOQUEA ACCESO. PARA SOLUCIONARLO, SOLAMENTE ABRIR Y CERRAR APLICACION.
 
 
 Se procuró a que todos los miembros pudiesen constribuir al proyecto, incluyendo commits de los colaboradores, Benjamin Morgado, Fiamma Tissera, Guido Mandile y el creador del repositorio, Nicolas Reyna.

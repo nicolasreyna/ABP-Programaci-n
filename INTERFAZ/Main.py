@@ -67,7 +67,6 @@ lbl_titulo.pack(pady=20)
 entrada_pass = ttk.Entry(ventana_login, show="*", font=("Arial", 12), width=20)
 entrada_pass.pack(pady=10)
 entrada_pass.focus()
-
 entrada_pass.bind("<Return>", lambda event: verificar_contrasena())
 
 btn_ingresar = ttk.Button(
